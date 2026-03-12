@@ -127,4 +127,46 @@ No environment variables are required. Railway injects `PORT` automatically and 
 
 ## License
 
-MIT
+Copyright (c) 2026 Eugene Yarney. All rights reserved.
+
+This software and its source code are proprietary and confidential.
+Unauthorized copying, distribution, modification, public display,
+or public performance of this software, in whole or in part, is
+strictly prohibited without the prior written permission of the
+copyright owner.
+
+RESTRICTIONS
+
+1. You may not copy, reproduce, or duplicate this software or any
+   portion of it.
+
+2. You may not modify, adapt, translate, or create derivative works
+   based on this software.
+
+3. You may not distribute, sublicense, sell, rent, lease, transfer,
+   or otherwise make this software available to any third party.
+
+4. You may not reverse engineer, disassemble, decompile, or attempt
+   to derive the source code of any compiled or obfuscated components
+   of this software.
+
+5. You may not use this software or any portion of it for any
+   commercial purpose without the express written consent of the
+   copyright owner.
+
+DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT OWNER BE LIABLE
+FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+CONTACT
+
+For licensing inquiries or permission requests, contact the
+copyright owner directly via the repository contact information.
+
