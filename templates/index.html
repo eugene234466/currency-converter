@@ -301,6 +301,75 @@
             animation: fadeUp 0.3s ease both;
         }
         .error-box.show { display: block; }
+
+        /* ── MOBILE ─────────────────────────────────────── */
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+                align-items: flex-start;
+            }
+
+            .card {
+                min-height: 100vh;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                border-top: none;
+                padding: 3rem 1.4rem 2rem;
+                box-shadow: none;
+            }
+
+            /* prevent iOS zoom on input focus (must be >= 16px) */
+            .amount-wrap input {
+                font-size: 1.8rem;
+            }
+
+            .select-wrap select {
+                font-size: 1rem;
+                padding: 0.85rem 0.75rem;
+            }
+
+            /* larger tap targets */
+            .swap-btn {
+                width: 44px;
+                height: 44px;
+            }
+
+            .convert-btn {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .result-main {
+                font-size: 1.3rem;
+            }
+
+            /* stack rate + updated on small screens */
+            .result-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.3rem;
+            }
+
+            .result-rate,
+            .result-updated {
+                font-size: 0.72rem;
+            }
+
+            /* safe area padding for notched phones */
+            .card {
+                padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+            }
+        }
+
+        @media (max-width: 360px) {
+            .currency-row {
+                grid-template-columns: 1fr 36px 1fr;
+                gap: 0.4rem;
+            }
+
+            .header-text h1 { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
