@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:           #0a0e1a;
+            --surface:      #111827;
+            --surface-2:    #1c2333;
+            --border:       #1e2d40;
+            --border-light: #2a3a50;
+            --accent:       #00d4aa;
+            --accent-dim:   rgba(0, 212, 170, 0.12);
+            --accent-glow:  rgba(0, 212, 170, 0.25);
+            --text-primary: #e8edf5;
+            --text-secondary: #8a99b3;
+            --text-muted:   #4a5568;
+            --red:          #f56565;
+            --red-dim:      rgba(245, 101, 101, 0.12);
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg);
+            font-family: 'IBM Plex Sans', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,212,170,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,212,170,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* ── CARD ───────────────────────────────────────── */
+        .card {
+            width: 100%;
+            max-width: 460px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.2rem 2.2rem 2rem;
+            box-shadow: 0 0 0 1px rgba(0,212,170,0.05), 0 24px 48px rgba(0,0,0,0.5);
+            animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+            position: relative;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 2rem; right: 2rem;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            border-radius: 0 0 4px 4px;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── HEADER ─────────────────────────────────────── */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .header-icon {
+            width: 42px; height: 42px;
+            background: var(--accent-dim);
+            border: 1px solid rgba(0,212,170,0.2);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .header-text h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+        }
+        .header-text p {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--accent);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        .live-badge {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .live-dot {
+            width: 6px; height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        /* ── LABELS ─────────────────────────────────────── */
+        label {
+            display: block;
+            font-size: 0.68rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ── AMOUNT INPUT ───────────────────────────────── */
+        .amount-wrap { margin-bottom: 1.4rem; }
+        .amount-wrap input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background: var(--surface-2);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.6rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .amount-wrap input::placeholder { color: var(--text-muted); }
+        .amount-wrap input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+        /* ── CURRENCY ROW ───────────────────────────────── */
+        .currency-row {
+            display: grid;
+            grid-template-columns: 1fr 40px 1fr;
+            gap: 0.6rem;
+            align-items: end;
+            margin-bottom: 1.5rem;
+        }
+        .select-wrap select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--surface-2);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .select-wrap select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .select-wrap select option { background: #1c2333; }
+
+        /* ── SWAP BUTTON ────────────────────────────────── */
+        .swap-btn {
+            width: 40px; height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            background: var(--surface-2);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: border-color 0.2s, color 0.2s, transform 0.3s cubic-bezier(.34,1.56,.64,1);
+        }
+        .swap-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: rotate(180deg);
+        }
+
+        /* ── CONVERT BUTTON ─────────────────────────────── */
+        .convert-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 10px;
+            color: #0a0e1a;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .convert-btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .convert-btn:active { transform: scale(0.99); }
+        .convert-btn.loading { pointer-events: none; opacity: 0.6; }
+        .convert-btn .btn-text { transition: opacity 0.2s; }
+        .convert-btn .spinner {
+            display: none;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(0,0,0,0.25);
+            border-top-color: #0a0e1a;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%,-50%);
+        }
+        @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+        .convert-btn.loading .btn-text { opacity: 0; }
+        .convert-btn.loading .spinner  { display: block; }
+
+        /* ── RESULT BOX ─────────────────────────────────── */
+        .result-box {
+            margin-top: 1.2rem;
+            padding: 1.2rem 1.3rem;
+            background: var(--accent-dim);
+            border: 1px solid rgba(0,212,170,0.2);
+            border-radius: 12px;
+            display: none;
+        }
+        .result-box.show {
+            display: block;
+            animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .result-main {
+            font-size: 1.45rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        .result-main .amount-from { color: var(--text-secondary); font-weight: 300; }
+        .result-main .amount-to   { color: var(--accent); }
+        .result-divider { height: 1px; background: var(--border); margin: 0.75rem 0; }
+        .result-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .result-rate {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .result-updated {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        /* ── ERROR BOX ──────────────────────────────────── */
+        .error-box {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            background: var(--red-dim);
+            border: 1px solid rgba(245,101,101,0.3);
+            border-radius: 10px;
+            color: var(--red);
+            font-size: 0.82rem;
+            display: none;
+            animation: fadeUp 0.3s ease both;
+        }
+        .error-box.show { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <div class="header">
+        <div class="header-icon">💱</div>
+        <div class="header-text">
+            <h1>Currency Converter</h1>
+            <p>Live Exchange Rates</p>
+        </div>
+        <div class="live-badge">
+            <span class="live-dot"></span>
+            Live
+        </div>
+    </div>
+
+    <div class="amount-wrap">
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" placeholder="0.00" min="0" step="any" />
+    </div>
+
+    <div class="currency-row">
+        <div class="select-wrap">
+            <label for="from-currency">From</label>
+            <select id="from-currency"></select>
+        </div>
+        <button class="swap-btn" id="swap-btn" title="Swap">⇄</button>
+        <div class="select-wrap">
+            <label for="to-currency">To</label>
+            <select id="to-currency"></select>
+        </div>
+    </div>
+
+    <button class="convert-btn" id="convert-btn">
+        <span class="btn-text">Convert</span>
+        <div class="spinner"></div>
+    </button>
+
+    <div class="result-box" id="result-box">
+        <div class="result-main" id="result-main"></div>
+        <div class="result-divider"></div>
+        <div class="result-meta">
+            <span class="result-rate" id="result-rate"></span>
+            <span class="result-updated" id="result-updated"></span>
+        </div>
+    </div>
+
+    <div class="error-box" id="error-box">
+        <span id="error-msg"></span>
+    </div>
+
+</div>
+
+<script>
+    const fromSel    = document.getElementById('from-currency');
+    const toSel      = document.getElementById('to-currency');
+    const amountInp  = document.getElementById('amount');
+    const convertBtn = document.getElementById('convert-btn');
+    const swapBtn    = document.getElementById('swap-btn');
+    const resultBox  = document.getElementById('result-box');
+    const resultMain = document.getElementById('result-main');
+    const resultRate = document.getElementById('result-rate');
+    const resultUpd  = document.getElementById('result-updated');
+    const errorBox   = document.getElementById('error-box');
+    const errorMsg   = document.getElementById('error-msg');
+
+    async function loadCurrencies() {
+        try {
+            const res  = await fetch('/currencies');
+            const list = await res.json();
+            list.forEach(code => {
+                fromSel.innerHTML += `<option value="${code}">${code}</option>`;
+                toSel.innerHTML   += `<option value="${code}">${code}</option>`;
+            });
+            fromSel.value = 'USD';
+            toSel.value   = 'EUR';
+        } catch (e) {
+            showError('Failed to load currencies.');
+        }
+    }
+
+    async function convert() {
+        hideError();
+        hideResult();
+
+        const amount   = amountInp.value.trim();
+        const from_cur = fromSel.value;
+        const to_cur   = toSel.value;
+
+        if (!amount || isNaN(amount) || Number(amount) <= 0) {
+            showError('Please enter a valid positive amount.');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res  = await fetch('/convert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: Number(amount), from_cur, to_cur })
+            });
+            const data = await res.json();
+            if (!res.ok) { showError(data.error || 'Conversion failed.'); return; }
+
+            resultMain.innerHTML = `
+                <span class="amount-from">${Number(data.amount).toLocaleString()} ${data.from} =</span><br>
+                <span class="amount-to">${Number(data.result).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${data.to}</span>
+            `;
+            resultRate.textContent = `1 ${data.from} = ${data.rate} ${data.to}`;
+            resultUpd.textContent  = `Updated ${data.last_updated}`;
+            showResult();
+        } catch (e) {
+            showError('Network error. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    swapBtn.addEventListener('click', () => {
+        const tmp     = fromSel.value;
+        fromSel.value = toSel.value;
+        toSel.value   = tmp;
+        if (resultBox.classList.contains('show')) convert();
+    });
+
+    function setLoading(on) { convertBtn.classList.toggle('loading', on); }
+    function showError(msg) { errorMsg.textContent = msg; errorBox.classList.add('show'); }
+    function hideError()    { errorBox.classList.remove('show'); }
+    function showResult()   { resultBox.classList.add('show'); }
+    function hideResult()   { resultBox.classList.remove('show'); }
+
+    convertBtn.addEventListener('click', convert);
+    amountInp.addEventListener('keydown', e => { if (e.key === 'Enter') convert(); });
+
+    loadCurrencies();
+</script>
+
+</body>
+</html>
