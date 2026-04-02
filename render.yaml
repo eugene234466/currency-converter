@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: currency-converter
+    runtime: python
+    repo: https://github.com/eugene234466/currency-converter  # Replace with your actual repo URL
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
